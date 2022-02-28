@@ -51,7 +51,7 @@ Style declarationsToStyle(Map<String, List<css.Expression>> declarations) {
           List<String> possibleBorderValues = ["dotted", "dashed", "solid", "double", "groove", "ridge", "inset", "outset", "none", "hidden"];
           /// List<css.LiteralTerm> might include other values than the ones we want for [BorderSide.style], so make sure to remove those before passing it to [ExpressionMapping]
           potentialStyles.removeWhere((element) => element == null || !possibleBorderValues.contains(element.text));
-          css.LiteralTerm borderStyle = potentialStyles.first!;
+          css.LiteralTerm? borderStyle = potentialStyles.firstOrNull;
           Border newBorder = Border(
             left: style.border?.left.copyWith(
               width: ExpressionMapping.expressionToBorderWidth(borderWidth),
@@ -84,7 +84,7 @@ Style declarationsToStyle(Map<String, List<css.Expression>> declarations) {
           List<String> possibleBorderValues = ["dotted", "dashed", "solid", "double", "groove", "ridge", "inset", "outset", "none", "hidden"];
           /// List<css.LiteralTerm> might include other values than the ones we want for [BorderSide.style], so make sure to remove those before passing it to [ExpressionMapping]
           potentialStyles.removeWhere((element) => element == null || !possibleBorderValues.contains(element.text));
-          css.LiteralTerm borderStyle = potentialStyles.first!;
+          css.LiteralTerm? borderStyle = potentialStyles.firstOrNull;
           Border newBorder = Border(
             left: style.border?.left ?? BorderSide.none,
             right: style.border?.right.copyWith(
@@ -117,7 +117,7 @@ Style declarationsToStyle(Map<String, List<css.Expression>> declarations) {
           List<String> possibleBorderValues = ["dotted", "dashed", "solid", "double", "groove", "ridge", "inset", "outset", "none", "hidden"];
           /// List<css.LiteralTerm> might include other values than the ones we want for [BorderSide.style], so make sure to remove those before passing it to [ExpressionMapping]
           potentialStyles.removeWhere((element) => element == null || !possibleBorderValues.contains(element.text));
-          css.LiteralTerm borderStyle = potentialStyles.first!;
+          css.LiteralTerm? borderStyle = potentialStyles.firstOrNull;
           Border newBorder = Border(
             left: style.border?.left ?? BorderSide.none,
             right: style.border?.right ?? BorderSide.none,
@@ -744,6 +744,8 @@ class ExpressionMapping {
         return ListStyleType.UPPER_LATIN;
       case 'upper-roman':
         return ListStyleType.UPPER_ROMAN;
+      case 'none':
+        return ListStyleType.NONE;
     }
     return null;
   }
