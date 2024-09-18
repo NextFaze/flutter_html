@@ -5,8 +5,8 @@ import 'package:flutter_html/html_parser.dart';
 import 'package:flutter_html/src/navigation_delegate.dart';
 import 'package:flutter_html/src/replaced_element.dart';
 import 'package:flutter_html/style.dart';
-import 'package:webview_flutter/webview_flutter.dart' as webview;
 import 'package:html/dom.dart' as dom;
+import 'package:webview_flutter/webview_flutter.dart' as webview;
 
 /// [IframeContentElement is a [ReplacedElement] with web content.
 class IframeContentElement extends ReplacedElement {
@@ -15,6 +15,7 @@ class IframeContentElement extends ReplacedElement {
   final double? height;
   final NavigationDelegate? navigationDelegate;
   final UniqueKey key = UniqueKey();
+  final controller = webview.WebViewController();
 
   IframeContentElement({
     required String name,
@@ -34,25 +35,29 @@ class IframeContentElement extends ReplacedElement {
       child: ContainerSpan(
         style: context.style,
         newContext: context,
-        child: webview.WebView(
-          initialUrl: src,
+        child: webview.WebViewWidget(
+          controller: controller
+            ..setJavaScriptMode(
+                sandboxMode == null || sandboxMode == "allow-scripts"
+                    ? webview.JavaScriptMode.unrestricted
+                    : webview.JavaScriptMode.disabled)
+            ..loadRequest(Uri.parse(src ?? ''))
+            ..setNavigationDelegate(webview.NavigationDelegate(
+                onNavigationRequest: (request) async {
+              final result = await navigationDelegate!(NavigationRequest(
+                url: request.url,
+                isForMainFrame: request.isMainFrame,
+              ));
+              if (result == NavigationDecision.prevent) {
+                return webview.NavigationDecision.prevent;
+              } else {
+                return webview.NavigationDecision.navigate;
+              }
+            })),
           key: key,
-          javascriptMode: sandboxMode == null || sandboxMode == "allow-scripts"
-            ? webview.JavascriptMode.unrestricted
-            : webview.JavascriptMode.disabled,
-        navigationDelegate: (request) async {
-          final result = await navigationDelegate!(NavigationRequest(
-            url: request.url,
-            isForMainFrame: request.isForMainFrame,
-          ));
-          if (result == NavigationDecision.prevent) {
-            return webview.NavigationDecision.prevent;
-          } else {
-            return webview.NavigationDecision.navigate;
-          }
-        },
           gestureRecognizers: {
-            Factory<VerticalDragGestureRecognizer>(() => VerticalDragGestureRecognizer())
+            Factory<VerticalDragGestureRecognizer>(
+                () => VerticalDragGestureRecognizer())
           },
         ),
       ),
