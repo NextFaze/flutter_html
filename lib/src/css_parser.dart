@@ -1,6 +1,6 @@
 import 'package:collection/collection.dart';
-import 'package:csslib/visitor.dart' as css;
 import 'package:csslib/parser.dart' as cssparser;
+import 'package:csslib/visitor.dart' as css;
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:flutter_html/src/utils.dart';
@@ -1222,6 +1222,8 @@ class ExpressionMapping {
       return LengthOrPercent(double.parse(value.text), Unit.em);
     } else if (value is css.RemTerm) {
       return LengthOrPercent(double.parse(value.text), Unit.rem);
+    } else if (value is css.PercentageTerm) {
+      return LengthOrPercent(double.parse(value.text), Unit.percent);
       // TODO there are several other available terms processed by the CSS parser
     } else if (value is css.LengthTerm) {
       double number =
